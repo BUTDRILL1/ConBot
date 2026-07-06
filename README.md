@@ -1,51 +1,60 @@
 # ConBot 🤖
 
-**Convert anything to anything, fast. Fully offline, privacy-first, menu-driven.**
+**The Universal, Privacy-First Offline File Converter.**
 
-ConBot is a CLI-first, interactive file conversion tool. It runs as a globally installed command (`conbot`) that scans your current working directory, lets you navigate via arrow-key menus to select a source file and target format, and produces a converted file in a local `./conbot_output/` folder.
+ConBot is a globally installed, Python-based CLI tool that lets you seamlessly convert documents, spreadsheets, images, and media files without memorizing complex command-line flags. Driven by an interactive Terminal User Interface (TUI), ConBot smartly orchestrates system-level engines (`ffmpeg`, `pandoc`, `LibreOffice`, `pandas`) to deliver production-grade conversions straight to a local output folder.
 
-It supports Documents, Images, Videos, Audio, and Spreadsheets, automatically orchestrating best-in-class conversion engines (`pandoc`, `ffmpeg`, `LibreOffice`, `Pillow`, `pandas`) behind a simple, unified interface.
+> **Status:** MVP Complete & Published! Available globally on PyPI. Fully tested on Windows, natively compatible with Linux/macOS.
 
-> **Status:** Early development, built incrementally and pushed in stages. Not yet published to PyPI — see Installation below for installing from source.
+---
 
-## ✨ Features
+## ✨ Why ConBot?
 
-- **Zero Command Memorization:** Interactive TUI (Terminal User Interface). No need to memorize `ffmpeg` flags or `pandoc` syntax.
-- **Production-Grade Quality:** Uses the correct engine for each format pair (e.g., LibreOffice for strict `.docx` layout fidelity, ffmpeg for rapid video remuxing).
-- **100% Offline & Private:** No cloud uploads, no ads, no telemetry.
-- **Privacy-First Defaults:** Automatically strips identifying metadata (GPS coordinates, device models) from video and audio conversions by default.
-- **Smart Engine Routing:** Automatically detects if a video just needs a rapid container change (remux) vs a full re-encode (transcode).
+- **Zero Command Memorization:** Built with `questionary`, ConBot uses a stack-based state machine to provide an intuitive, continuous arrow-key menu. You are never kicked out after a successful conversion.
+- **Smart Engine Routing:** ConBot isn't just a wrapper; it's smart. 
+  - *Multi-sheet Excel files* automatically fan out into separate CSVs.
+  - *Markdown to PDF* invisibly chains through `pandoc` into `LibreOffice` for flawless layout rendering.
+  - *Video conversions* automatically attempt a rapid container remux (`-c copy`) before falling back to a full re-encode, saving immense time and quality.
+- **Privacy-First Defaults:** Video and audio conversions automatically strip identifying metadata (GPS coordinates, device models) via `-map_metadata -1`.
+- **Almost 100% Offline:** All conversions happen entirely locally on your machine.
+  - *Exception:* If you convert a Markdown (`.md`) file containing a Mermaid flowchart (````mermaid`), ConBot briefly pings the free `kroki.io` API to magically render the diagram as an image in your final document.
+
+---
 
 ## 🚀 Installation
 
-ConBot isn't published on PyPI yet, so `pipx install conbot` won't work yet. For now, install from source:
+### Install Globally from pipx
 
-```bash
-# Clone the repo
-git clone https://github.com/BUTDRILL1/conbot.git
-cd conbot
-
-# Install globally via pipx, from the local source folder
-pipx install .
-```
-
-Once published to PyPI, installation will simply be:
+ConBot is published on PyPI and designed to be installed globally via `pipx`.
 
 ```bash
 pipx install conbot
 ```
 
+*(Note: If you don't have `pipx` installed, you can get it via `pip install pipx` or your system package manager).*
+
+### Install from Source
+
+If you prefer to install directly from the latest source code:
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/BUTDRILL1/conbot.git
+cd conbot
+```
+
 ### System Dependencies
 
-ConBot orchestrates system-level tools to perform high-quality conversions. On your first run, ConBot will detect which engines you have installed and tell you exactly how to install any missing ones for your OS (e.g., via `apt`, `brew`, `pacman`, or `winget`).
+ConBot acts as a conductor for powerful system-level tools. On your first run, ConBot will intelligently scan your system path (including Windows `WinGet` and `Program Files` defaults) and tell you exactly how to install any missing engines. 
 
-ConBot never runs these install commands for you automatically — it only ever prints the correct command for your system, so you stay in control of what gets installed at the system level.
-
-| Category | Required engine |
+| Category | Required Engine |
 |---|---|
-| Documents / Spreadsheets | `pandoc` & `libreoffice` (headless) |
-| Video / Audio | `ffmpeg` |
-| Images | Handled natively via Python dependencies (Pillow + pillow-heif) — no extra install needed |
+| **Documents** | `pandoc` & `libreoffice` (headless) |
+| **Spreadsheets** | Native Python (`pandas`, `openpyxl`) + `libreoffice` (for PDFs) |
+| **Video & Audio** | `ffmpeg` |
+| **Images** | Native Python (`Pillow`, `pillow-heif`) — *no extra install needed* |
+
+---
 
 ## 💻 Usage
 
@@ -55,34 +64,23 @@ Simply open your terminal in the directory containing the files you want to conv
 conbot
 ```
 
-1. Navigate categories with `↑` / `↓` and press `Enter` to select.
-2. Choose your source file.
-3. Choose your target format.
-4. Your converted file will appear in `./conbot_output/`!
+1. **Select Category:** Navigate with `↑` / `↓` and press `Enter`.
+2. **Select File:** Choose your source file from the auto-scanned list.
+3. **Select Format:** Pick your target format.
+4. **Done:** Your converted file instantly appears in `./conbot_output/`.
+5. **Continuous Loop:** You'll be prompted to generate a different format, start over with a new file, or exit cleanly.
 
-Press `Esc` at any time to go back, or `Ctrl+C` to quit.
+*Press `Esc` at any time to go back a step, or `Ctrl+C` to quit.*
 
-## 🔒 Privacy & Security
+---
 
-- ConBot makes no network calls at runtime — all conversion happens locally.
-- ConBot never executes privileged (`sudo`/admin) commands on your behalf, on any OS.
-- Video/audio metadata that can identify you or your device (GPS location, device model, recording IDs) is stripped by default; you can opt to preserve it per conversion if you want it kept.
+## 🔒 Security & Access
 
-Full details in the project's Security & Access documentation.
+- ConBot never executes privileged (`sudo`/admin) commands on your behalf.
+- If dependencies are missing, ConBot merely *suggests* the installation command; it never runs arbitrary package managers on your machine.
+- All file I/O is restricted to your current working directory (specifically saving to `./conbot_output/` with robust collision handling).
 
-## 🗺️ Roadmap
-
-Built and released in stages:
-
-- [ ] Document + Image conversion
-- [ ] Spreadsheet conversion
-- [ ] Video conversion
-- [ ] Audio conversion
-- [ ] Cross-platform polish (Windows/macOS dependency messaging, error handling)
-
-## 🤝 Contributing
-
-ConBot was built primarily for personal use — fast, private, offline file conversion without ads or uploads. It's shared here in case it's useful to others. Issues and PRs are welcome, but please expect modest response times since this is a side project, not a maintained product.
+---
 
 ## 📄 License
 

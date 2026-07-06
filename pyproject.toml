@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conbot"
+version = "1.0.0"
+description = "Convert anything to anything, fast. Fully offline, privacy-first, menu-driven."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+dependencies = [
+    "questionary>=2.0.1",
+    "rich>=13.7.1",
+    "Pillow>=10.2.0",
+    "pillow-heif>=0.16.0",
+    "pandas>=2.2.1",
+    "openpyxl>=3.1.2"
+]
+
+[project.scripts]
+conbot = "conbot.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0"
+]
+
+[tool.setuptools.packages.find]
+include = ["conbot*"]
+exclude = ["conenv*"]
